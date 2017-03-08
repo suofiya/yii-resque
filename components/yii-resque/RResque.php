@@ -202,7 +202,7 @@ class RResque extends CApplicationComponent
                 break;
 
             case Resque_Job_Status::STATUS_COMPLETE:
-                return "Failed";
+                return "Completed";
                 break;
 
             case ResqueScheduler_Job_Status::STATUS_SCHEDULED:
@@ -244,7 +244,7 @@ class RResque extends CApplicationComponent
      */
     public function getResque($func)
     {
-        if (method_exists("Resque", $func) 
+        if (method_exists("Resque", $func)) 
         {
             $numargs = func_num_args();
             unset($numargs[0]);

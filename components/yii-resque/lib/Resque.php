@@ -221,12 +221,23 @@ class Resque
 	 * @param string $class The name of the class that contains the code to execute the job.
 	 * @param array $args Any optional arguments that should be passed when the job is executed.
 	 * @param boolean $trackStatus Set to true to be able to monitor the status of a job.
+	 * @param string  $id 延时执行的Job ID
 	 *
 	 * @return string|boolean Job ID when the job was created, false if creation was cancelled due to beforeEnqueue
 	 */
-	public static function enqueue($queue, $class, $args = null, $trackStatus = false)
+	public static function enqueue($queue, $class, $args = null, $trackStatus = false, $id=null)
 	{
-		$id         = Resque::generateJobId();
+		if (is_null($id)) {
+			$id = Resque::generateJobId();
+		}
+		// 延时任务ID，modified by liutao
+		if (!empty($id)) {
+			$status = new Resque_Job_Status($id);
+			// 存在则不需要创建Resque_Job_Status
+			if($status->isTracking()) {
+				$trackStatus = false;
+			}
+		}
 		$hookParams = array(
 			'class' => $class,
 			'args'  => $args,

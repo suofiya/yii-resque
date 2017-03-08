@@ -24,9 +24,10 @@ Yii resque is a component for Yii to queue your background jobs, this component 
         'port' => '6379',            // Redis server port
         'database' => 0,             // Redis database number
         'password' => '',            // Redis password auth, set to '' or null when no auth needed
-        'includeFiles' => array()    // Absolute path of files that will be included when initiate queue
-        'loghandler' => 'RotatingFile' // Monolog handler type without "handler"
-        'logtarget' => '/var/log/mylog' // Target log file or configuration (please refer to logging section)
+	'prefix' => 'xx',            // Redis key prefix
+        'includeFiles' => array(),   // Absolute path of files that will be included when initiate queue
+        'loghandler' => 'RotatingFile', // Monolog handler type without "handler"
+        'logtarget' => '/var/log/mylog', // Target log file or configuration (please refer to logging section)
     ),
     ...
 )
@@ -96,7 +97,7 @@ or run job after n second
 ```php
 $in = 3600;
 $args = array('id' => $user->id);
-Yii::app()->resque->enqueueIn($in, 'email', 'Worker_ClassWorker', $args, $track = true);
+Yii::app()->resque->enqueueJobIn($in, 'email', 'Worker_ClassWorker', $args, $track = true);
 ```
 
 ### Check Job Status

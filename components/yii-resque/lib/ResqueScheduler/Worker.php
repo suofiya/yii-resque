@@ -73,16 +73,21 @@ class ResqueScheduler_Worker
 	{
 		$item = null;
 		while ($item = ResqueScheduler::nextItemForTimestamp($timestamp)) {
-			$this->log('queueing ' . $item['class'] . ' in ' . $item['queue'] .' [delayed]');
+			$this->log('queueing ' . $item['class'] . ' in ' . $item['queue'] . ' job_id=' . $item['args'][0]['id'] . ' [delayed]');
 			
 			Resque_Event::trigger('beforeDelayedEnqueue', array(
 				'queue' => $item['queue'],
 				'class' => $item['class'],
 				'args'  => $item['args'],
+				'track' => $item['track'],
 			));
 
-			$payload = array_merge(array($item['queue'], $item['class']), $item['args']);
+			$payload = array_merge( array($item['queue'], $item['class']), $item['args'], array(false, $item['args'][0]['id']) );
 			call_user_func_array('Resque::enqueue', $payload);
+			
+			//$this->log('queueing ' . $item['class'] . ' in ' . $item['queue'] . ' payload=' . print_r($payload, true) . ' [debug]');
+			
+			$this->log('queueing ' . $item['class'] . ' in ' . $item['queue'] . ' job_id=' . $item['args'][0]['id'] . ' [processed]');
 		}
 	}
 	
