@@ -62,6 +62,9 @@ class Resque_Job
 				'Supplied $args must be an array.'
 			);
 		}
+		// worker参数中增加jobID, modified by liutao
+		$args['job_id'] = $id;
+		// push
 		Resque::push($queue, array(
 			'class'	=> $class,
 			'args'	=> array($args),
