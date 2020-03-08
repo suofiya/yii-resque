@@ -55,9 +55,9 @@ class ResqueScheduler_Worker
 	 */
 	public function handleDelayedItems($timestamp = null)
 	{
-		while (($timestamp = ResqueScheduler::nextDelayedTimestamp($timestamp)) !== false) {
+		while (($oldestJobTimestamp = ResqueScheduler::nextDelayedTimestamp($timestamp)) !== false) {
 			$this->updateProcLine('Processing Delayed Items');
-			$this->enqueueDelayedItemsForTimestamp($timestamp);
+			$this->enqueueDelayedItemsForTimestamp($oldestJobTimestamp);
 		}
 	}
 	
@@ -84,9 +84,7 @@ class ResqueScheduler_Worker
 
 			$payload = array_merge( array($item['queue'], $item['class']), $item['args'], array(false, $item['args'][0]['id']) );
 			call_user_func_array('Resque::enqueue', $payload);
-			
-			//$this->log('queueing ' . $item['class'] . ' in ' . $item['queue'] . ' payload=' . print_r($payload, true) . ' [debug]');
-			
+						
 			$this->log('queueing ' . $item['class'] . ' in ' . $item['queue'] . ' job_id=' . $item['args'][0]['id'] . ' [processed]');
 		}
 	}
@@ -114,7 +112,7 @@ class ResqueScheduler_Worker
 			setproctitle('resque-scheduler-' . ResqueScheduler::VERSION . ': ' . $status);
 		}
 	}
-
+	
     /**
      * Register class instance as a logger
      * @param  object 	$logger 	Class instance
